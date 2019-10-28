@@ -1,11 +1,11 @@
 import React from 'react';
 import { Api } from './Api';
+import { Pokemon } from './Pokemon';
 
 class App extends React.Component {
   state = {
     pokemons: null,
     pokemonsLoading: false,
-    pokemonDetails: {},
     selectedPokemon: null,
   };
 
@@ -17,17 +17,15 @@ class App extends React.Component {
 
   handlePokemonClick = async name => {
     this.setState({ selectedPokemon: name });
-    const pokemonData = await Api.getPokemon(name);
-    const nextPokemonDetails = {
-      ...this.state.pokemonDetails,
-      [name]: pokemonData,
-    };
-    this.setState({ pokemonDetails: nextPokemonDetails });
+    // const pokemonData = await Api.getPokemon(name);
+    // const nextPokemonDetails = {
+    //   ...this.state.pokemonDetails,
+    //   [name]: pokemonData,
+    // };
+    // this.setState({ pokemonDetails: nextPokemonDetails });
   };
 
   render() {
-    const pokemonData = this.state.pokemonDetails[this.state.selectedPokemon] || null;
-
     return (
       <div className="wrapper">
         <header>
@@ -60,15 +58,10 @@ class App extends React.Component {
             })()}
           </div>
           <div className="content">
-            {pokemonData === null ? (
-              <p>?????</p>
+            {this.state.selectedPokemon === null ? (
+              <p>Select a pokemon</p>
             ) : (
-              <React.Fragment>
-                <h2>
-                  {pokemonData.name} ({pokemonData.count})
-                </h2>
-                <img src={pokemonData.sprites.front_default} alt="" />
-              </React.Fragment>
+              <Pokemon key={this.state.selectedPokemon} name={this.state.selectedPokemon} />
             )}
           </div>
         </main>

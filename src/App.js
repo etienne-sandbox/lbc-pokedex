@@ -1,11 +1,13 @@
 import React from 'react';
 import { Api } from './Api';
+import { usePokemon } from './usePokemon';
 
 const App = () => {
   const [pokemons, setPokemons] = React.useState(null);
   const [pokemonsLoading, setPokemonsLoading] = React.useState(false);
-  const [pokemonDetails, setPokemonDetails] = React.useState({});
   const [selectedPokemon, setSelectedPokemon] = React.useState('ivysaur');
+  const pokemonData = usePokemon(selectedPokemon);
+  const bulbasaurData = usePokemon('bulbasaur');
 
   React.useEffect(() => {
     setPokemonsLoading(true);
@@ -21,30 +23,9 @@ const App = () => {
     };
   }, []);
 
-  React.useEffect(() => {
-    let canceled = false;
-    Api.getPokemon(selectedPokemon).then(pokemonData => {
-      if (canceled) {
-        return;
-      }
-      setPokemonDetails(prevPokemonDetails => {
-        const nextPokemonDetails = {
-          ...prevPokemonDetails,
-          [selectedPokemon]: pokemonData,
-        };
-        return nextPokemonDetails;
-      });
-    });
-    return () => {
-      canceled = true;
-    };
-  }, [selectedPokemon]);
-
   const handlePokemonClick = async name => {
     setSelectedPokemon(name);
   };
-
-  const pokemonData = pokemonDetails[selectedPokemon] || null;
 
   return (
     <div className="wrapper">
@@ -88,6 +69,7 @@ const App = () => {
               <img src={pokemonData.sprites.front_default} alt="" />
             </React.Fragment>
           )}
+          <div>{bulbasaurData && <img src={bulbasaurData.sprites.front_default} alt="" />}</div>
         </div>
       </main>
     </div>

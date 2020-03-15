@@ -1,80 +1,80 @@
-import React from 'react';
-import { Api } from './Api';
+import React from "react";
+import { Api } from "./Api";
 
-class App extends React.Component {
-  state = {
-    pokemons: null,
-    pokemonsLoading: false,
-    pokemonDetails: {},
-    selectedPokemon: null,
-  };
+const App = () => {
+  const [pokemons, setPokemons] = React.useState(null);
+  const [pokemonsLoading, setPokemonsLoading] = React.useState(false);
+  const [pokemonDetails, setPokemonDetails] = React.useState({});
+  const [selectedPokemon, setSelectedPokemon] = React.useState(null);
 
-  async componentDidMount() {
-    this.setState({ pokemonsLoading: true });
-    const pokemons = await Api.getPokemons();
-    this.setState({ pokemons, pokemonsLoading: false });
-  }
+  React.useEffect(() => {
+    setPokemonsLoading(true);
+    Api.getPokemons().then(pokemons => {
+      setPokemons(pokemons);
+      setPokemonsLoading(false);
+    });
+  }, []);
 
-  handlePokemonClick = async name => {
-    this.setState({ selectedPokemon: name });
+  const handlePokemonClick = async name => {
+    setSelectedPokemon(name);
     const pokemonData = await Api.getPokemon(name);
     const nextPokemonDetails = {
-      ...this.state.pokemonDetails,
-      [name]: pokemonData,
+      ...pokemonDetails,
+      [name]: pokemonData
     };
-    this.setState({ pokemonDetails: nextPokemonDetails });
+    setPokemonDetails(nextPokemonDetails);
   };
 
-  render() {
-    const pokemonData = this.state.pokemonDetails[this.state.selectedPokemon] || null;
+  const pokemonData = pokemonDetails[selectedPokemon] || null;
 
-    return (
-      <div className="wrapper">
-        <header>
-          <h1>Pokedex</h1>
-        </header>
-        <main>
-          <div className="left-menu">
-            {(() => {
-              if (this.state.pokemonsLoading) {
-                return <p>Loading...</p>;
-              }
-              if (this.state.pokemons === null) {
-                return <p>No Data</p>;
-              }
-              return (
-                <ul>
-                  {this.state.pokemons.map(pokemon => {
-                    return (
-                      <li
-                        key={pokemon.name}
-                        onClick={async () => this.handlePokemonClick(pokemon.name)}
-                        className={this.state.selectedPokemon === pokemon.name ? 'selected' : ''}
-                      >
-                        {pokemon.name}
-                      </li>
-                    );
-                  })}
-                </ul>
-              );
-            })()}
-          </div>
-          <div className="content">
-            {pokemonData === null ? (
-              <p>?????</p>
-            ) : (
-              <React.Fragment>
-                <h2>
-                  {pokemonData.name} ({pokemonData.count})
-                </h2>
-                <img src={pokemonData.sprites.front_default} alt="" />
-              </React.Fragment>
-            )}
-          </div>
-        </main>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="wrapper">
+      <header>
+        <h1>Pokedex</h1>
+      </header>
+      <main>
+        <div className="left-menu">
+          {(() => {
+            if (pokemonsLoading) {
+              return <p>Loading...</p>;
+            }
+            if (pokemons === null) {
+              return <p>No Data</p>;
+            }
+            return (
+              <ul>
+                {pokemons.map(pokemon => {
+                  return (
+                    <li
+                      key={pokemon.name}
+                      onClick={() => handlePokemonClick(pokemon.name)}
+                      className={
+                        selectedPokemon === pokemon.name ? "selected" : ""
+                      }
+                    >
+                      {pokemon.name}
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()}
+        </div>
+        <div className="content">
+          {pokemonData === null ? (
+            <p>?????</p>
+          ) : (
+            <React.Fragment>
+              <h2>
+                {pokemonData.name} ({pokemonData.count})
+              </h2>
+              <img src={pokemonData.sprites.front_default} alt="" />
+            </React.Fragment>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+};
 
 export default App;
